@@ -166,7 +166,7 @@ export default function HeroSection() {
       onMouseLeave={() => setIsHovered(false)}
       className="relative w-full mt-16 lg:mt-28 overflow-hidden bg-[#FAF7F0] text-zinc-900 dark:bg-[#050507] dark:text-white pt-14 pb-20 md:pt-20 md:pb-28 lg:pt-24 lg:pb-32 transition-colors duration-300"
     >
-      {/* Global Keyframes so SVG Icons & Charts Always Animate Reliably */}
+      {/* Motion Graphics Keyframes */}
       <style jsx global>{`
         @keyframes candlePopUp {
           0% {
@@ -253,92 +253,6 @@ export default function HeroSection() {
             opacity: 0;
             transform: translateY(-12px) scale(0.92);
           }
-        }
-
-        /* True Double-Pulse Heartbeat Jump for Leading Icons */
-        @keyframes bdeHeartbeatGold {
-          0%, 100% {
-            transform: scale(1) translateY(0px);
-            filter: drop-shadow(0 0 3px rgba(251, 191, 36, 0.5));
-          }
-          14% {
-            transform: scale(1.42) translateY(-1.5px);
-            filter: drop-shadow(0 0 12px rgba(251, 191, 36, 1));
-          }
-          28% {
-            transform: scale(1.05) translateY(0px);
-            filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.6));
-          }
-          42% {
-            transform: scale(1.32) translateY(-1px);
-            filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.95));
-          }
-          65% {
-            transform: scale(1) translateY(0px);
-            filter: drop-shadow(0 0 3px rgba(251, 191, 36, 0.5));
-          }
-        }
-
-        @keyframes bdeHeartbeatEmerald {
-          0%, 100% {
-            transform: scale(1) translateY(0px);
-            filter: drop-shadow(0 0 3px rgba(52, 211, 153, 0.5));
-          }
-          14% {
-            transform: scale(1.42) translateY(-1.5px);
-            filter: drop-shadow(0 0 12px rgba(52, 211, 153, 1));
-          }
-          28% {
-            transform: scale(1.05) translateY(0px);
-            filter: drop-shadow(0 0 5px rgba(52, 211, 153, 0.6));
-          }
-          42% {
-            transform: scale(1.32) translateY(-1px);
-            filter: drop-shadow(0 0 10px rgba(52, 211, 153, 0.95));
-          }
-          65% {
-            transform: scale(1) translateY(0px);
-            filter: drop-shadow(0 0 3px rgba(52, 211, 153, 0.5));
-          }
-        }
-
-        @keyframes bdeHeartbeatCyan {
-          0%, 100% {
-            transform: scale(1) translateY(0px);
-            filter: drop-shadow(0 0 3px rgba(56, 189, 248, 0.5));
-          }
-          14% {
-            transform: scale(1.42) translateY(-1.5px);
-            filter: drop-shadow(0 0 12px rgba(56, 189, 248, 1));
-          }
-          28% {
-            transform: scale(1.05) translateY(0px);
-            filter: drop-shadow(0 0 5px rgba(56, 189, 248, 0.6));
-          }
-          42% {
-            transform: scale(1.32) translateY(-1px);
-            filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.95));
-          }
-          65% {
-            transform: scale(1) translateY(0px);
-            filter: drop-shadow(0 0 3px rgba(56, 189, 248, 0.5));
-          }
-        }
-
-        .bde-beat-gold {
-          display: inline-block;
-          transform-origin: center center;
-          animation: bdeHeartbeatGold 1.65s cubic-bezier(0.22, 1, 0.36, 1) infinite 0s;
-        }
-        .bde-beat-emerald {
-          display: inline-block;
-          transform-origin: center center;
-          animation: bdeHeartbeatEmerald 1.65s cubic-bezier(0.22, 1, 0.36, 1) infinite 0.5s;
-        }
-        .bde-beat-cyan {
-          display: inline-block;
-          transform-origin: center center;
-          animation: bdeHeartbeatCyan 1.65s cubic-bezier(0.22, 1, 0.36, 1) infinite 1s;
         }
 
         .candle-motion-item {
@@ -511,13 +425,14 @@ export default function HeroSection() {
           {/* Left Side */}
           <div className="w-full lg:w-[58%] space-y-6 text-center">
             
-            {/* 3 Authority Badges Row (True Heartbeat-Jumping Leading Icons, No Circles) */}
+            {/* 3 Authority Badges Row (Radar Ping / Blinking Ripple Icons, No Extra Circles) */}
             <div className="flex flex-wrap items-center justify-center gap-2.5">
               
               {/* Badge 1: MyFxBook & FXBlue Verified AI */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-100/90 dark:bg-zinc-900/95 border border-amber-500/40 shadow-[0_0_20px_rgba(245,158,11,0.2)] backdrop-blur-md">
-                <span className="bde-beat-gold shrink-0">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                <span className="relative inline-flex items-center justify-center w-3.5 h-3.5 shrink-0">
+                  <Sparkles className="animate-ping absolute inline-flex w-full h-full text-amber-500 dark:text-amber-400 opacity-80" />
+                  <Sparkles className="relative inline-flex w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                 </span>
                 <span className="text-[11px] sm:text-xs font-bold tracking-wider uppercase text-amber-900 dark:text-amber-300">
                   MyFxBook &amp; FXBlue Verified AI
@@ -526,8 +441,12 @@ export default function HeroSection() {
 
               {/* Badge 2: FTMO & Prop Firm Ready */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/90 dark:bg-emerald-950/70 border border-emerald-500/40 shadow-[0_0_20px_rgba(16,185,129,0.2)] backdrop-blur-md">
-                <span className="bde-beat-emerald shrink-0">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                <span className="relative inline-flex items-center justify-center w-3.5 h-3.5 shrink-0">
+                  <ShieldCheck
+                    style={{ animationDelay: "0.4s" }}
+                    className="animate-ping absolute inline-flex w-full h-full text-emerald-500 dark:text-emerald-400 opacity-80"
+                  />
+                  <ShieldCheck className="relative inline-flex w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 </span>
                 <span className="text-[11px] sm:text-xs font-bold tracking-wider uppercase text-emerald-900 dark:text-emerald-300">
                   FTMO &amp; Prop Firm Ready
@@ -536,8 +455,12 @@ export default function HeroSection() {
 
               {/* Badge 3: 4D Nano AI • Platform MT4 & MT5 */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-100/90 dark:bg-sky-950/70 border border-sky-500/40 shadow-[0_0_20px_rgba(14,165,233,0.2)] backdrop-blur-md">
-                <span className="bde-beat-cyan shrink-0">
-                  <Cpu className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
+                <span className="relative inline-flex items-center justify-center w-3.5 h-3.5 shrink-0">
+                  <Cpu
+                    style={{ animationDelay: "0.8s" }}
+                    className="animate-ping absolute inline-flex w-full h-full text-sky-500 dark:text-sky-400 opacity-80"
+                  />
+                  <Cpu className="relative inline-flex w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                 </span>
                 <span className="text-[11px] sm:text-xs font-bold tracking-wider uppercase text-sky-900 dark:text-sky-300">
                   4D Nano AI • Platform MT4 &amp; MT5
@@ -656,8 +579,9 @@ export default function HeroSection() {
                   <div className="absolute bottom-4 left-4 right-4 bg-black/80 backdrop-blur-md border border-amber-500/20 rounded-xl px-3 py-2 flex items-center justify-between">
                     <span className="text-xs font-bold text-amber-400">BlackDiamond AI</span>
                     <span className="text-[10px] text-zinc-300 flex items-center gap-1">
-                      <span className="bde-beat-emerald">
-                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                      <span className="relative inline-flex items-center justify-center w-3.5 h-3.5">
+                        <ShieldCheck className="animate-ping absolute inline-flex w-full h-full text-emerald-400 opacity-80" />
+                        <ShieldCheck className="relative inline-flex w-3.5 h-3.5 text-emerald-400" />
                       </span>{" "}
                       Prop Safe
                     </span>
