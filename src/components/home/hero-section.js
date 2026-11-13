@@ -139,7 +139,7 @@ export default function HeroSection() {
   useEffect(() => {
     const interval = setInterval(() => {
       setChartIndex((prev) => (prev + 1) % CANDLE_SCENARIOS.length);
-    }, 10200);
+    }, 20200);
     return () => clearInterval(interval);
   }, []);
 
@@ -166,18 +166,18 @@ export default function HeroSection() {
       onMouseLeave={() => setIsHovered(false)}
       className="relative w-full mt-16 lg:mt-28 overflow-hidden bg-[#FAF7F0] text-zinc-900 dark:bg-[#050507] dark:text-white pt-14 pb-20 md:pt-20 md:pb-28 lg:pt-24 lg:pb-32 transition-colors duration-300"
     >
-      {/* Motion Graphics Keyframes */}
+      {/* Motion Graphics Keyframes (Subtle 45% Peak Opacity on Floating Badges) */}
       <style jsx global>{`
         @keyframes candlePopUp {
           0% {
             opacity: 0;
             transform: translateY(35px) scaleY(0.2);
           }
-          12% {
+          6% {
             opacity: 1;
             transform: translateY(0px) scaleY(1);
           }
-          88% {
+          93% {
             opacity: 1;
             transform: translateY(0px) scaleY(1);
           }
@@ -192,16 +192,16 @@ export default function HeroSection() {
             stroke-dashoffset: 1800;
             opacity: 0;
           }
-          6% {
-            opacity: 0.9;
+          3% {
+            opacity: 0.75;
           }
-          28% {
+          15% {
             stroke-dashoffset: 0;
-            opacity: 0.9;
+            opacity: 0.75;
           }
-          88% {
+          93% {
             stroke-dashoffset: 0;
-            opacity: 0.9;
+            opacity: 0.75;
           }
           100% {
             stroke-dashoffset: 0;
@@ -214,16 +214,16 @@ export default function HeroSection() {
             opacity: 0;
             transform: translate(-50%, -40%) scale(0.88);
           }
-          16% {
+          8% {
             opacity: 0;
             transform: translate(-50%, -40%) scale(0.88);
           }
-          26% {
-            opacity: 0.8;
+          14% {
+            opacity: 0.45;
             transform: translate(-50%, -50%) scale(1);
           }
-          88% {
-            opacity: 0.8;
+          93% {
+            opacity: 0.45;
             transform: translate(-50%, -50%) scale(1);
           }
           100% {
@@ -237,16 +237,16 @@ export default function HeroSection() {
             opacity: 0;
             transform: translateY(14px) scale(0.92);
           }
-          20% {
+          10% {
             opacity: 0;
             transform: translateY(14px) scale(0.92);
           }
-          30% {
-            opacity: 0.8;
+          16% {
+            opacity: 0.45;
             transform: translateY(0px) scale(1);
           }
-          88% {
-            opacity: 0.8;
+          93% {
+            opacity: 0.45;
             transform: translateY(0px) scale(1);
           }
           100% {
@@ -259,22 +259,22 @@ export default function HeroSection() {
           transform-box: fill-box;
           transform-origin: bottom center;
           opacity: 0;
-          animation: candlePopUp 10s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+          animation: candlePopUp 20s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
 
         .trend-ma-line {
           stroke-dasharray: 1800;
-          animation: trendLineFlow 10s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+          animation: trendLineFlow 20s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
 
         .center-gold-badge {
           opacity: 0;
-          animation: centerGoldPopup 10s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+          animation: centerGoldPopup 20s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
 
         .top-profit-badge {
           opacity: 0;
-          animation: topWinRatePopup 10s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+          animation: topWinRatePopup 20s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
 
         @keyframes laserSlide {
@@ -315,13 +315,13 @@ export default function HeroSection() {
         }}
       />
 
-      {/* Forex Motion Graphics Candlestick Layer */}
+      {/* Forex Motion Graphics Candlestick Layer (Lowered Subtle Opacity) */}
       <div
         key={chartIndex}
         className="pointer-events-none absolute inset-0 overflow-hidden"
       >
         <svg
-          className="w-full h-full opacity-35 dark:opacity-45"
+          className="w-full h-full opacity-20 dark:opacity-25"
           viewBox="0 0 1380 700"
           fill="none"
           preserveAspectRatio="none"
@@ -386,10 +386,10 @@ export default function HeroSection() {
           />
         </svg>
 
-        {/* Top Floating Profit Percentage Badge (80% Opacity) */}
+        {/* Top Floating Profit Percentage Badge (Subtle 45% Opacity) */}
         <div
           key={`win-${chartIndex}`}
-          className="top-profit-badge hidden md:flex items-center gap-2 absolute top-[14%] right-[36%] px-4 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-400/50 backdrop-blur-md shadow-[0_0_25px_rgba(16,185,129,0.3)]"
+          className="top-profit-badge hidden md:flex items-center gap-2 absolute top-[14%] right-[36%] px-4 py-1.5 rounded-full bg-emerald-950/60 border border-emerald-400/35 backdrop-blur-md shadow-[0_0_16px_rgba(16,185,129,0.18)]"
         >
           <TrendingUp className="w-4 h-4 text-emerald-400" />
           <span className="text-xs font-mono font-extrabold tracking-wider text-emerald-300">
@@ -397,13 +397,13 @@ export default function HeroSection() {
           </span>
         </div>
 
-        {/* Middle Point Decimal Profit Badge Highlighted in Gold (80% Opacity) */}
+        {/* Middle Point Decimal Profit Badge Highlighted in Gold (Subtle 45% Opacity) */}
         <div
           key={`pair-${chartIndex}`}
-          className="center-gold-badge hidden md:flex items-center gap-3 absolute top-1/2 left-1/2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-[#1A1405]/80 via-[#261C06]/80 to-[#1A1405]/80 border border-amber-400/65 backdrop-blur-xl shadow-[0_0_35px_rgba(245,158,11,0.38)]"
+          className="center-gold-badge hidden md:flex items-center gap-3 absolute top-1/2 left-1/2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-[#1A1405]/60 via-[#261C06]/60 to-[#1A1405]/60 border border-amber-400/40 backdrop-blur-xl shadow-[0_0_20px_rgba(245,158,11,0.2)]"
         >
           <span className="relative flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-300 opacity-80"></span>
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-300 opacity-70"></span>
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-400"></span>
           </span>
           <div className="flex items-center gap-2 font-mono">

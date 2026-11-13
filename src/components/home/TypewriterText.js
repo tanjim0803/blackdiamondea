@@ -10,33 +10,32 @@ const words = [
 ];
 
 export default function TypewriterText() {
-  const [text, setText] = useState("");
+  const [text, setText] = useState("Trade Smarter");
   const [wordIndex, setWordIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const currentWord = words[wordIndex];
 
-    let speed = isDeleting ? 50 : 100;
+    // Slower, calmer typing & deleting cadence so it never feels jarring
+    let speed = isDeleting ? 65 : 125;
 
-    // Pause when a word is fully typed
+    // Hold each completed phrase steady for 10 full seconds
     if (!isDeleting && text === currentWord) {
-      speed = 1800;
+      speed = 10000;
     }
 
-    // Pause before typing the next word
+    // Gentle pause before the next phrase begins
     if (isDeleting && text === "") {
-      speed = 500;
+      speed = 750;
     }
 
     const timer = setTimeout(() => {
-      // Finished typing
       if (!isDeleting && text === currentWord) {
         setIsDeleting(true);
         return;
       }
 
-      // Finished deleting
       if (isDeleting && text === "") {
         setIsDeleting(false);
         setWordIndex((prev) => (prev + 1) % words.length);
@@ -46,7 +45,7 @@ export default function TypewriterText() {
       setText(
         isDeleting
           ? currentWord.substring(0, text.length - 1)
-          : currentWord.substring(0, text.length + 1),
+          : currentWord.substring(0, text.length + 1)
       );
     }, speed);
 
@@ -54,14 +53,19 @@ export default function TypewriterText() {
   }, [text, isDeleting, wordIndex]);
 
   return (
-    <>
-      <h1 className="text-primary text-3xl md:text-[40px] lg:text-[56px] md:leading-15 lg:leading-20  font-extrabold text-center">
-        BlackDiamond SpecialEa <br/> {" "}
-        <span className="text-secondary">
+    <h1 className="text-3xl sm:text-4xl md:text-[42px] lg:text-[52px] font-extrabold text-center tracking-tight leading-[1.2] text-zinc-900 dark:text-white">
+      <span className="block">BlackDiamond SpecialEa</span>
+
+      {/* Fixed-height slot prevents any vertical jump when text clears or wraps */}
+      <span className="mt-1.5 sm:mt-2 min-h-[2.6em] sm:min-h-[1.35em] flex items-center justify-center">
+        <span className="bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 dark:from-amber-200 dark:via-amber-400 dark:to-yellow-500 bg-clip-text text-transparent">
           {text}
-          <span className="animate-pulse">|</span>
         </span>
-      </h1>
-    </>
+        <span
+          aria-hidden="true"
+          className="inline-block w-[3px] h-7 sm:h-9 lg:h-11 ml-1.5 rounded-full bg-amber-500 dark:bg-amber-400 opacity-85 animate-pulse"
+        />
+      </span>
+    </h1>
   );
 }

@@ -67,18 +67,22 @@ export default function SocialSidebar() {
 
   return (
     <>
-      {/* Continuous Vertical Glowing Light Sweep Keyframes */}
-      <style jsx>{`
-        @keyframes socialBeamSweep {
+      {/* Periodic Vertical Glowing Light Sweep Keyframes (Once Every 20 Seconds) */}
+      <style jsx global>{`
+        @keyframes socialBeamSweep20s {
           0% {
             transform: translateY(-100%);
             opacity: 0;
           }
-          20% {
+          2% {
             opacity: 1;
           }
-          80% {
+          8% {
             opacity: 1;
+          }
+          10% {
+            transform: translateY(250%);
+            opacity: 0;
           }
           100% {
             transform: translateY(250%);
@@ -86,7 +90,7 @@ export default function SocialSidebar() {
           }
         }
         .animate-social-beam {
-          animation: socialBeamSweep 2.4s ease-in-out infinite;
+          animation: socialBeamSweep20s 20s ease-in-out infinite;
         }
       `}</style>
 
@@ -132,7 +136,7 @@ export default function SocialSidebar() {
           ))}
         </div>
 
-        {/* Larger 32px Peeking Handle Tab with Continuous Vertical Glowing Light Sweep */}
+        {/* Larger 32px Peeking Handle Tab with 20s Periodic Vertical Glowing Light Sweep */}
         <button
           type="button"
           onClick={() => setIsOpen((prev) => !prev)}
@@ -140,8 +144,8 @@ export default function SocialSidebar() {
           title="Social Media Channels"
           className="group relative -ml-[1px] overflow-hidden flex flex-col items-center justify-center gap-2 w-8 py-4 rounded-r-2xl bg-white/95 dark:bg-[#0B0B10]/95 backdrop-blur-xl border border-l-0 border-amber-400/70 text-amber-600 dark:text-amber-300 shadow-[4px_0_24px_rgba(245,158,11,0.38)] hover:border-amber-300 hover:shadow-[6px_0_30px_rgba(251,191,36,0.65)] cursor-pointer transition-all duration-300"
         >
-          {/* Continuous Vertical Flowing Golden Glow Beam (Top-to-Bottom) */}
-          <span className="pointer-events-none absolute inset-x-0 top-0 h-14 bg-gradient-to-b from-transparent via-amber-400/50 to-transparent animate-social-beam" />
+          {/* Periodic Vertical Flowing Golden Glow Beam (Once Every 20 Seconds) */}
+          <span className="pointer-events-none absolute inset-x-0 top-0 h-14 bg-gradient-to-b from-transparent via-amber-400/55 to-transparent animate-social-beam" />
 
           {/* Right Edge Bright Laser Glow Line */}
           <span className="pointer-events-none absolute right-0 top-2 bottom-2 w-[2px] rounded-full bg-gradient-to-b from-transparent via-amber-300 to-transparent opacity-90" />
