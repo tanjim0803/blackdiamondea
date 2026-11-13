@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { ArrowUp } from "lucide-react";
 
 export default function ScrollToTop() {
   const [isVisible, setIsVisible] = useState(false);
@@ -32,20 +33,13 @@ export default function ScrollToTop() {
 
   return (
     <button
+      type="button"
       onClick={scrollToTop}
-      className="fixed bottom-42 right-8.5 z-1000 p-2 bg-primary cursor-pointer transition-[opacity,transform] duration-300 ease-in-out rounded-xs"
       aria-label="Scroll to top"
+      title="Back to Top"
+      className="group fixed bottom-36 right-5 z-50 w-11 h-11 rounded-full flex items-center justify-center bg-white/95 dark:bg-[#0B0B10]/95 hover:bg-gradient-to-br hover:from-amber-300 hover:via-amber-400 hover:to-yellow-600 backdrop-blur-xl text-zinc-900 dark:text-amber-300 hover:text-black border border-amber-500/45 hover:border-amber-300 shadow-[0_4px_20px_rgba(0,0,0,0.3)] hover:shadow-[0_0_24px_rgba(245,158,11,0.55)] hover:-translate-y-1 transition-all duration-300 cursor-pointer"
     >
-      <svg
-        className="transform-[rotate(180deg)] fill-white"
-        xmlns="http://www.w3.org/2000/svg"
-        version="1.1"
-        width="15px"
-        height="15px"
-        viewBox="57 35.171 26 16.043"
-      >
-        <path d="M57.5,38.193l12.5,12.5l12.5-12.5l-2.5-2.5l-10,10l-10-10L57.5,38.193z"></path>
-      </svg>
+      <ArrowUp className="w-4 h-4 stroke-[2.5] transition-transform duration-300 group-hover:-translate-y-0.5" />
     </button>
   );
 }

@@ -56,7 +56,7 @@ export default function TypewriterText() {
   return (
     <>
       <h1 className="text-primary text-3xl md:text-[40px] lg:text-[56px] md:leading-15 lg:leading-20  font-extrabold text-center">
-        BlackDiamond SpecialEa <br/> with{" "}
+        BlackDiamond SpecialEa <br/> {" "}
         <span className="text-secondary">
           {text}
           <span className="animate-pulse">|</span>
