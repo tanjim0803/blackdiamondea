@@ -166,8 +166,8 @@ export default function HeroSection() {
       onMouseLeave={() => setIsHovered(false)}
       className="relative w-full mt-16 lg:mt-28 overflow-hidden bg-[#FAF7F0] text-zinc-900 dark:bg-[#050507] dark:text-white pt-14 pb-20 md:pt-20 md:pb-28 lg:pt-24 lg:pb-32 transition-colors duration-300"
     >
-      {/* Motion Graphics & Glowing Icon Keyframes (10s Cycle with 6s Hold) */}
-      <style jsx>{`
+      {/* Global Keyframes so SVG Icons & Charts Always Animate Reliably */}
+      <style jsx global>{`
         @keyframes candlePopUp {
           0% {
             opacity: 0;
@@ -219,11 +219,11 @@ export default function HeroSection() {
             transform: translate(-50%, -40%) scale(0.88);
           }
           26% {
-            opacity: 1;
+            opacity: 0.8;
             transform: translate(-50%, -50%) scale(1);
           }
           88% {
-            opacity: 1;
+            opacity: 0.8;
             transform: translate(-50%, -50%) scale(1);
           }
           100% {
@@ -242,11 +242,11 @@ export default function HeroSection() {
             transform: translateY(14px) scale(0.92);
           }
           30% {
-            opacity: 1;
+            opacity: 0.8;
             transform: translateY(0px) scale(1);
           }
           88% {
-            opacity: 1;
+            opacity: 0.8;
             transform: translateY(0px) scale(1);
           }
           100% {
@@ -255,47 +255,90 @@ export default function HeroSection() {
           }
         }
 
-        @keyframes iconSparkleGlow {
+        /* True Double-Pulse Heartbeat Jump for Leading Icons */
+        @keyframes bdeHeartbeatGold {
           0%, 100% {
-            transform: scale(1);
-            filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.5));
+            transform: scale(1) translateY(0px);
+            filter: drop-shadow(0 0 3px rgba(251, 191, 36, 0.5));
           }
-          50% {
-            transform: scale(1.22);
+          14% {
+            transform: scale(1.42) translateY(-1.5px);
             filter: drop-shadow(0 0 12px rgba(251, 191, 36, 1));
           }
+          28% {
+            transform: scale(1.05) translateY(0px);
+            filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.6));
+          }
+          42% {
+            transform: scale(1.32) translateY(-1px);
+            filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.95));
+          }
+          65% {
+            transform: scale(1) translateY(0px);
+            filter: drop-shadow(0 0 3px rgba(251, 191, 36, 0.5));
+          }
         }
 
-        @keyframes shieldGlowPulse {
+        @keyframes bdeHeartbeatEmerald {
           0%, 100% {
-            transform: scale(1);
-            filter: drop-shadow(0 0 4px rgba(52, 211, 153, 0.5));
+            transform: scale(1) translateY(0px);
+            filter: drop-shadow(0 0 3px rgba(52, 211, 153, 0.5));
           }
-          50% {
-            transform: scale(1.2);
+          14% {
+            transform: scale(1.42) translateY(-1.5px);
             filter: drop-shadow(0 0 12px rgba(52, 211, 153, 1));
           }
+          28% {
+            transform: scale(1.05) translateY(0px);
+            filter: drop-shadow(0 0 5px rgba(52, 211, 153, 0.6));
+          }
+          42% {
+            transform: scale(1.32) translateY(-1px);
+            filter: drop-shadow(0 0 10px rgba(52, 211, 153, 0.95));
+          }
+          65% {
+            transform: scale(1) translateY(0px);
+            filter: drop-shadow(0 0 3px rgba(52, 211, 153, 0.5));
+          }
         }
 
-        @keyframes cpuGlowPulse {
+        @keyframes bdeHeartbeatCyan {
           0%, 100% {
-            transform: scale(1);
-            filter: drop-shadow(0 0 4px rgba(56, 189, 248, 0.5));
+            transform: scale(1) translateY(0px);
+            filter: drop-shadow(0 0 3px rgba(56, 189, 248, 0.5));
           }
-          50% {
-            transform: scale(1.2);
+          14% {
+            transform: scale(1.42) translateY(-1.5px);
             filter: drop-shadow(0 0 12px rgba(56, 189, 248, 1));
           }
+          28% {
+            transform: scale(1.05) translateY(0px);
+            filter: drop-shadow(0 0 5px rgba(56, 189, 248, 0.6));
+          }
+          42% {
+            transform: scale(1.32) translateY(-1px);
+            filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.95));
+          }
+          65% {
+            transform: scale(1) translateY(0px);
+            filter: drop-shadow(0 0 3px rgba(56, 189, 248, 0.5));
+          }
         }
 
-        .glow-icon-gold {
-          animation: iconSparkleGlow 2s ease-in-out infinite;
+        .bde-beat-gold {
+          display: inline-block;
+          transform-origin: center center;
+          animation: bdeHeartbeatGold 1.65s cubic-bezier(0.22, 1, 0.36, 1) infinite 0s;
         }
-        .glow-icon-emerald {
-          animation: shieldGlowPulse 2.2s ease-in-out infinite 0.5s;
+        .bde-beat-emerald {
+          display: inline-block;
+          transform-origin: center center;
+          animation: bdeHeartbeatEmerald 1.65s cubic-bezier(0.22, 1, 0.36, 1) infinite 0.5s;
         }
-        .glow-icon-cyan {
-          animation: cpuGlowPulse 2.4s ease-in-out infinite 1s;
+        .bde-beat-cyan {
+          display: inline-block;
+          transform-origin: center center;
+          animation: bdeHeartbeatCyan 1.65s cubic-bezier(0.22, 1, 0.36, 1) infinite 1s;
         }
 
         .candle-motion-item {
@@ -311,10 +354,12 @@ export default function HeroSection() {
         }
 
         .center-gold-badge {
+          opacity: 0;
           animation: centerGoldPopup 10s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
 
         .top-profit-badge {
+          opacity: 0;
           animation: topWinRatePopup 10s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
 
@@ -427,16 +472,22 @@ export default function HeroSection() {
           />
         </svg>
 
-        {/* Top Floating Profit Percentage Badge */}
-        <div className="top-profit-badge hidden md:flex items-center gap-2 absolute top-[14%] right-[36%] px-4 py-1.5 rounded-full bg-emerald-950/90 border border-emerald-400/50 backdrop-blur-md shadow-[0_0_25px_rgba(16,185,129,0.35)]">
+        {/* Top Floating Profit Percentage Badge (80% Opacity) */}
+        <div
+          key={`win-${chartIndex}`}
+          className="top-profit-badge hidden md:flex items-center gap-2 absolute top-[14%] right-[36%] px-4 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-400/50 backdrop-blur-md shadow-[0_0_25px_rgba(16,185,129,0.3)]"
+        >
           <TrendingUp className="w-4 h-4 text-emerald-400" />
           <span className="text-xs font-mono font-extrabold tracking-wider text-emerald-300">
             ▲ {currentScenario.winRate} Profit
           </span>
         </div>
 
-        {/* Middle Point Decimal Profit Badge Highlighted in Gold */}
-        <div className="center-gold-badge hidden md:flex items-center gap-3 absolute top-1/2 left-1/2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-[#1A1405]/95 via-[#261C06]/95 to-[#1A1405]/95 border border-amber-400/70 backdrop-blur-xl shadow-[0_0_40px_rgba(245,158,11,0.45)]">
+        {/* Middle Point Decimal Profit Badge Highlighted in Gold (80% Opacity) */}
+        <div
+          key={`pair-${chartIndex}`}
+          className="center-gold-badge hidden md:flex items-center gap-3 absolute top-1/2 left-1/2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-[#1A1405]/80 via-[#261C06]/80 to-[#1A1405]/80 border border-amber-400/65 backdrop-blur-xl shadow-[0_0_35px_rgba(245,158,11,0.38)]"
+        >
           <span className="relative flex h-2.5 w-2.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-300 opacity-80"></span>
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-400"></span>
@@ -460,42 +511,36 @@ export default function HeroSection() {
           {/* Left Side */}
           <div className="w-full lg:w-[58%] space-y-6 text-center">
             
-            {/* 3 Glowing Authority Badges Row */}
+            {/* 3 Authority Badges Row (True Heartbeat-Jumping Leading Icons, No Circles) */}
             <div className="flex flex-wrap items-center justify-center gap-2.5">
               
               {/* Badge 1: MyFxBook & FXBlue Verified AI */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-100/90 dark:bg-zinc-900/95 border border-amber-500/40 shadow-[0_0_20px_rgba(245,158,11,0.2)] backdrop-blur-md">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-80"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500 dark:bg-amber-400"></span>
+                <span className="bde-beat-gold shrink-0">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                 </span>
-                <span className="text-[11px] sm:text-xs font-bold tracking-wider uppercase text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
-                  MyFxBook & FXBlue Verified AI
-                  <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 glow-icon-gold" />
+                <span className="text-[11px] sm:text-xs font-bold tracking-wider uppercase text-amber-900 dark:text-amber-300">
+                  MyFxBook &amp; FXBlue Verified AI
                 </span>
               </div>
 
               {/* Badge 2: FTMO & Prop Firm Ready */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/90 dark:bg-emerald-950/70 border border-emerald-500/40 shadow-[0_0_20px_rgba(16,185,129,0.2)] backdrop-blur-md">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-80"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 dark:bg-emerald-400"></span>
+                <span className="bde-beat-emerald shrink-0">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 </span>
-                <span className="text-[11px] sm:text-xs font-bold tracking-wider uppercase text-emerald-900 dark:text-emerald-300 flex items-center gap-1.5">
-                  FTMO & Prop Firm Ready
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 glow-icon-emerald" />
+                <span className="text-[11px] sm:text-xs font-bold tracking-wider uppercase text-emerald-900 dark:text-emerald-300">
+                  FTMO &amp; Prop Firm Ready
                 </span>
               </div>
 
               {/* Badge 3: 4D Nano AI • Platform MT4 & MT5 */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-100/90 dark:bg-sky-950/70 border border-sky-500/40 shadow-[0_0_20px_rgba(14,165,233,0.2)] backdrop-blur-md">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-500 opacity-80"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500 dark:bg-sky-400"></span>
+                <span className="bde-beat-cyan shrink-0">
+                  <Cpu className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                 </span>
-                <span className="text-[11px] sm:text-xs font-bold tracking-wider uppercase text-sky-900 dark:text-sky-300 flex items-center gap-1.5">
-                  4D Nano AI • Platform MT4 & MT5
-                  <Cpu className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 glow-icon-cyan" />
+                <span className="text-[11px] sm:text-xs font-bold tracking-wider uppercase text-sky-900 dark:text-sky-300">
+                  4D Nano AI • Platform MT4 &amp; MT5
                 </span>
               </div>
 
@@ -508,7 +553,7 @@ export default function HeroSection() {
 
             {/* Centered Subtitle Above the Stats Card */}
             <p className="text-zinc-700 dark:text-zinc-300 text-base md:text-lg font-medium max-w-2xl text-center mx-auto leading-relaxed">
-              No guesswork. No stress. Just proven, institutional-grade automated Forex & Gold trading engineered for consistent growth.
+              No guesswork. No stress. Just proven, institutional-grade automated Forex &amp; Gold trading engineered for consistent growth.
             </p>
 
             {/* Centered Gradient-Bordered Glassmorphism Live Performance Snapshot */}
@@ -611,7 +656,10 @@ export default function HeroSection() {
                   <div className="absolute bottom-4 left-4 right-4 bg-black/80 backdrop-blur-md border border-amber-500/20 rounded-xl px-3 py-2 flex items-center justify-between">
                     <span className="text-xs font-bold text-amber-400">BlackDiamond AI</span>
                     <span className="text-[10px] text-zinc-300 flex items-center gap-1">
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 glow-icon-emerald" /> Prop Safe
+                      <span className="bde-beat-emerald">
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                      </span>{" "}
+                      Prop Safe
                     </span>
                   </div>
                 </div>
