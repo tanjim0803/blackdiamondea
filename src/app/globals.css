@@ -12,37 +12,47 @@
   --color-nav-text: var(--nav-text);
   --color-text-primary: var(--text-primary);
   --color-section-bg: var(--section-bg);
-  --font-heading: var(--font-oswald), sans-serif;
-  --font-body: var(--font-lato), serif;
+  --font-heading: var(--font-jakarta), var(--font-oswald), sans-serif;
+  --font-body: var(--font-jakarta), var(--font-lato), sans-serif;
   --background-image-article-bg-1: url("../../public/assets/home/articles/article-background-I.webp");
   --background-image-article-bg-2: url("../../public/assets/home/articles/article-background-II.webp");
   --animate-zoom-pulse: zoomPulse 3s ease-in-out infinite;
 }
 
+/* Luxury Cream Light Mode Variables */
 :root {
-  --background: oklch(1 0 0);
-  --primary: #aa570b;
-  --secondary: #0f5071;
-  --nav-bg: #f9f3ee;
-  --nav-text: #333333;
-  --text-primary: #0f0f0f;
-  --section-bg: #f6f6f6;
+  --background: #FAF7F0;
+  --primary: #D97706;
+  --secondary: #B45309;
+  --nav-bg: #F5EFE4;
+  --nav-text: #18181B;
+  --text-primary: #18181B;
+  --section-bg: #FFFDF9;
 }
 
+/* Default Obsidian Gold & Carbon Dark Mode Variables */
 .dark {
-  --background: oklch(0.13 0.028 261.692);
-  --primary: #0f5071;
-  --secondary: #aa570b;
-  --nav-bg: #121719;
-  --nav-text: #eddfdf;
-  --text-primary: oklch(95.155% 0.00753 16.5);
-  --section-bg: #060f35;
+  --background: #050507;
+  --primary: #F59E0B;
+  --secondary: #D97706;
+  --nav-bg: #0A0805;
+  --nav-text: #FDE68A;
+  --text-primary: #FFFFFF;
+  --section-bg: #0B0B10;
 }
 
 /* Base */
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    background-color: var(--background);
+  }
+
   body {
     font-family: var(--font-body);
+    background-color: var(--background);
+    color: var(--text-primary);
+    overflow-x: hidden;
   }
 
   h1,
@@ -52,90 +62,83 @@
   h5,
   h6 {
     font-family: var(--font-heading);
+    letter-spacing: -0.02em;
   }
 
   h1 {
-    @apply text-[28px] md:text-4xl xl:text-5xl font-bold;
+    @apply text-[28px] md:text-4xl xl:text-5xl font-extrabold;
   }
   h2 {
-    @apply text-2xl md:text-[28px] xl:text-4xl font-semibold;
+    @apply text-2xl md:text-3xl xl:text-4xl font-extrabold;
   }
   h3 {
-    @apply text-xl md:text-2xl xl:text-3xl font-semibold;
+    @apply text-xl md:text-2xl xl:text-3xl font-bold;
   }
   h4 {
-    @apply text-lg md:text-xl xl:text-2xl font-medium;
+    @apply text-lg md:text-xl xl:text-2xl font-semibold;
   }
 
   button {
-    @apply text-sm md:text-base xl:text-base font-medium;
+    @apply text-sm md:text-base font-semibold;
+  }
+
+  /* Preserve Natural Aspect Ratio for All Images */
+  img,
+  picture,
+  video {
+    max-width: 100%;
+    height: auto;
   }
 }
 
-/* Components */
+/* Components - Compact & Clean Container Without Forced Vertical Gaps */
 @layer components {
   .container {
-    @apply mx-auto px-4 max-w-7xl my-10 md:my-14 xl:my-20;
+    @apply mx-auto px-4 sm:px-6 max-w-7xl my-0;
   }
 
   .text-body {
-    @apply text-sm md:text-base xl:text-base font-normal;
+    @apply text-sm md:text-base font-normal leading-relaxed;
   }
 
   .text-body-large {
-    @apply text-base md:text-lg xl:text-xl font-normal;
+    @apply text-base md:text-lg xl:text-xl font-medium leading-relaxed;
   }
 }
 
 /* Utilities */
 @layer utilities {
+  .gold-text-gradient {
+    @apply bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 dark:from-amber-200 dark:via-amber-400 dark:to-yellow-500 bg-clip-text text-transparent;
+  }
+
+  .gold-card-surface {
+    @apply bg-white/95 dark:bg-[#0B0B10]/95 backdrop-blur-xl border border-amber-500/35;
+  }
 }
 
-/* Language Switcher Style */
+/* Custom Luxury Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #F59E0B, #B45309);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #FBBF24;
+}
+
+/* Google Translate Switcher Style */
 .goog-logo-link,
 .goog-te-gadget span {
-  display: none !important;
-}
-
-.goog-te-gadget {
-  font-size: 0;
-}
-
-.gt-wrapper select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-
-  @apply w-[160px]
-  md:w-40
-    text-primary
-    rounded
-    border
-    bg-gray-900
-    px-4
-    py-2
-    pr-10
-    text-xs
-    md:text-sm
-    shadow-sm
-    cursor-pointer
-    transition
-    focus:outline-none
-    focus:ring-2
-    focus:ring-blue-500
-    border-gray-700
-    hover:bg-gray-800;
-}
-
-.goog-te-banner-frame.skiptranslate {
-  display: none !important;
-}
-
-body {
-  top: 0 !important;
-}
-
-.goog-logo-link {
   display: none !important;
 }
 
@@ -156,16 +159,50 @@ body {
   margin: 0px !important;
 }
 
+.gt-wrapper select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  @apply w-[150px]
+    md:w-40
+    rounded-lg
+    border
+    px-3.5
+    py-2
+    pr-9
+    text-xs
+    md:text-sm
+    font-semibold
+    shadow-sm
+    cursor-pointer
+    transition-all
+    duration-200
+    focus:outline-none
+    focus:ring-2
+    focus:ring-amber-400
+    bg-[#FFFDF9]
+    text-zinc-900
+    border-amber-500/45
+    dark:bg-[#12100B]
+    dark:text-amber-100
+    dark:border-amber-500/50
+    dark:hover:border-amber-400;
+}
+
+.goog-te-banner-frame.skiptranslate {
+  display: none !important;
+}
+
+body {
+  top: 0 !important;
+}
+
+/* Keyframe Animations */
 @utility animate-zoom-shake {
   animation: zoomShakeSequence 1.5s ease-in-out infinite;
 }
 
-/* Timeline breakdown:
-  0% - 15%   -> Zooms in from 100% to 110%
-  15% - 70%  -> Holds the 110% zoom while shaking rapidly
-  70% - 80%  -> Zooms back down from 110% to 100% and stops rotating
-  80% - 100% -> Sits still at 100% scale before starting over
-*/
 @keyframes zoomShakeSequence {
   0% {
     transform: scale(1) rotate(0deg);
@@ -199,29 +236,27 @@ body {
   0% {
     transform: scale(1);
     opacity: 0.65;
-    box-shadow: 0 0 0 0px rgba(239, 68, 68, 0.7); /* Starts tight */
+    box-shadow: 0 0 0 0px rgba(245, 158, 11, 0.7);
   }
   70% {
-    transform: scale(1.04, 1.3); /* Expands slightly outwards */
+    transform: scale(1.04, 1.3);
     opacity: 0;
-    box-shadow: 0 0 0 24px rgba(239, 68, 68, 0); /* Fades into transparency */
+    box-shadow: 0 0 0 24px rgba(245, 158, 11, 0);
   }
   100% {
     transform: scale(1);
     opacity: 0;
-    box-shadow: 0 0 0 0px rgba(239, 68, 68, 0);
+    box-shadow: 0 0 0 0px rgba(245, 158, 11, 0);
   }
 }
 
 @keyframes zoomPulse {
   0%,
   100% {
-    transform: translateY(0);
-    transform: scale(1);
+    transform: translateY(0) scale(1);
   }
 
   50% {
-    transform: translateY(18px);
-    transform: scale(1.1);
+    transform: translateY(12px) scale(1.06);
   }
 }

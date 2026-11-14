@@ -1,65 +1,85 @@
+// src/app/layout.jsx
+"use client";
+
+import { usePathname } from "next/navigation";
 import { Header } from "@/components/shared/header";
 import "./globals.css";
 import Footer from "@/components/shared/footer";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Poppins } from "next/font/google";
-import { Oswald, Lato } from "next/font/google";
+import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import TelegramButton from "@/components/shared/TelegramButton";
 import GetFreeAIButton from "@/components/shared/GetFreeAIButton";
-import OrdersNotification from "@/components/shared/OrdersNotification";
 import ScrollToTop from "@/components/shared/scroll-to-top";
 import SocialSidebar from "@/components/shared/SocialSidebar";
 import Script from "next/script";
 import FreeOfferPopupGlobal from "@/components/popup/FreeOfferPopupGlobal";
 
-export const metadata = {
-  title: "Best Forex Robot",
-};
-
-const oswald = Oswald({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  variable: "--font-oswald",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-jakarta",
   display: "swap",
 });
 
-const lato = Lato({
+const jetbrains = JetBrains_Mono({
   subsets: ["latin"],
-  weight: ["100", "300", "400", "700", "900"],
-  variable: "--font-lato",
+  weight: ["500", "700", "800"],
+  variable: "--font-mono",
   display: "swap",
 });
 
 export default function RootLayout({ children }) {
+  const pathname = usePathname();
+  const isResellerRoute = pathname?.startsWith("/reseller");
+
   return (
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${oswald.variable} ${lato.variable}`}
+      className={`${jakarta.variable} ${jetbrains.variable}`}
     >
-      <body className="antialiased">
+      <body
+        style={{ fontFamily: "var(--font-jakarta), sans-serif" }}
+        className={`antialiased transition-colors duration-300 selection:bg-amber-400 selection:text-black ${
+          isResellerRoute
+            ? ""
+            : "bg-[#FAF7F0] text-zinc-900 dark:bg-[#050507] dark:text-white"
+        }`}
+      >
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="dark"
+          enableSystem={false}
           disableTransitionOnChange
         >
-          <header>
-            <Header />
-          </header>
+          {!isResellerRoute && (
+            <header className="sticky top-0 z-50">
+              <Header />
+            </header>
+          )}
 
-          <main className="min-h-[70vh]">{children}</main>
+          <main className={isResellerRoute ? "min-h-screen" : "min-h-[70vh]"}>
+            {children}
+          </main>
 
-          <footer>
-            <Footer />
-          </footer>
-          {/* <OrdersNotification /> */}
-          <SocialSidebar />
-          <ScrollToTop />
-          <GetFreeAIButton />
-          <TelegramButton />
+          {!isResellerRoute && (
+            <footer>
+              <Footer />
+            </footer>
+          )}
+
+          {!isResellerRoute && (
+            <>
+              <SocialSidebar />
+              <ScrollToTop />
+              <GetFreeAIButton />
+              <TelegramButton />
+              <FreeOfferPopupGlobal />
+            </>
+          )}
+
           <ToastContainer
             position="top-right"
             autoClose={5000}
@@ -70,9 +90,8 @@ export default function RootLayout({ children }) {
             pauseOnFocusLoss
             draggable
             pauseOnHover
-            theme="light"
+            theme="dark"
           />
-          <FreeOfferPopupGlobal />
         </ThemeProvider>
 
         {/* Histats */}

@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { X, Star, ZoomIn, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -16,11 +16,10 @@ import Autoplay from "embla-carousel-autoplay";
 
 const clientFeedbacksItems = Array.from({ length: 99 }, (_, i) => {
   const num = String(i + 1).padStart(2, "0");
-
   return {
     id: i + 1,
     item: `/assets/home/client-feedbacks/client-feedback-${num}.webp`,
-    alt: `Blackdiamondea Client Feedback ${num}`,
+    alt: `BlackDiamond EA Client Feedback ${num}`,
   };
 });
 
@@ -32,6 +31,7 @@ function AnimatedModal({
   setCurrentIndex,
 }) {
   useEffect(() => {
+    if (!isOpen) return;
     const handleKey = (e) => {
       if (e.key === "Escape") onClose();
       if (e.key === "ArrowRight")
@@ -42,10 +42,9 @@ function AnimatedModal({
 
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [onClose, images.length, setCurrentIndex]);
+  }, [isOpen, onClose, images.length, setCurrentIndex]);
 
   const nextImage = () => setCurrentIndex((prev) => (prev + 1) % images.length);
-
   const prevImage = () =>
     setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
 
@@ -53,16 +52,16 @@ function AnimatedModal({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Overlay */}
+          {/* Dark Blurred Backdrop */}
           <motion.div
-            className="fixed inset-0 bg-black/90 z-50"
+            className="fixed inset-0 bg-black/92 backdrop-blur-md z-50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
           />
 
-          {/* Viewer */}
+          {/* Fullscreen Image Viewer */}
           <motion.div
             className="fixed inset-0 z-50 flex items-center justify-center px-4"
             initial={{ opacity: 0 }}
@@ -70,43 +69,56 @@ function AnimatedModal({
             exit={{ opacity: 0 }}
           >
             <div
-              className="relative w-full max-w-6xl flex items-center justify-center"
+              className="relative w-full max-w-5xl flex items-center justify-center"
               onClick={(e) => e.stopPropagation()}
             >
+              {/* Close Button */}
               <Button
                 size="icon"
-                className="absolute top-0 right-0 text-white z-50 cursor-pointer rounded-full"
+                className="absolute -top-12 right-0 bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-black border border-amber-400/50 z-50 cursor-pointer rounded-full transition-all"
                 onClick={onClose}
               >
-                <X className="h-7 w-7" />
+                <X className="h-6 w-6" />
               </Button>
+
+              {/* Previous Image */}
               <button
                 onClick={prevImage}
-                className="absolute left-5 text-white text-4xl z-50"
+                aria-label="Previous feedback"
+                className="absolute left-2 sm:-left-12 p-2.5 rounded-full bg-zinc-900/90 hover:bg-amber-500 text-amber-300 hover:text-black border border-amber-400/40 z-50 cursor-pointer transition-all"
               >
-                ❮
+                <ChevronLeft className="w-6 h-6" />
               </button>
+
               <motion.div
                 key={currentIndex}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="max-h-[90vh]"
+                transition={{ duration: 0.25 }}
+                className="relative max-h-[85vh] rounded-2xl p-1.5 bg-gradient-to-b from-amber-400/50 to-amber-600/30 shadow-[0_0_50px_rgba(245,158,11,0.3)]"
               >
                 <Image
                   src={images[currentIndex]}
-                  alt="Full View"
+                  alt="Client Feedback Full View"
                   width={1200}
                   height={1600}
-                  className="max-h-[90vh] w-auto object-contain rounded-lg"
+                  className="max-h-[82vh] w-auto object-contain rounded-xl bg-[#0B0B10]"
                 />
+
+                {/* Image Counter */}
+                <div className="absolute -bottom-9 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-zinc-900/90 border border-amber-500/40 text-amber-300 text-xs font-mono font-bold">
+                  Client Review #{currentIndex + 1} / {images.length}
+                </div>
               </motion.div>
+
+              {/* Next Image */}
               <button
                 onClick={nextImage}
-                className="absolute right-5 text-white text-4xl z-50"
+                aria-label="Next feedback"
+                className="absolute right-2 sm:-right-12 p-2.5 rounded-full bg-zinc-900/90 hover:bg-amber-500 text-amber-300 hover:text-black border border-amber-400/40 z-50 cursor-pointer transition-all"
               >
-                ❯
+                <ChevronRight className="w-6 h-6" />
               </button>
             </div>
           </motion.div>
@@ -119,6 +131,9 @@ function AnimatedModal({
 export default function Testimonial() {
   const [open, setOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const sectionRef = useRef(null);
+  const [mousePos, setMousePos] = useState({ x: 500, y: 250 });
+  const [isHovered, setIsHovered] = useState(false);
 
   const images = clientFeedbacksItems.map((item) => item.item);
 
@@ -126,18 +141,73 @@ export default function Testimonial() {
     Autoplay({
       delay: 3000,
       stopOnInteraction: false,
-    }),
+    })
   );
 
+  const handleMouseMove = (e) => {
+    if (!sectionRef.current) return;
+    const rect = sectionRef.current.getBoundingClientRect();
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
+
   return (
-    <section className="w-full">
-      <div className="container my-0 py-10 md:py-12 lg:py-15 xl:py-20 -mt-10 md:-mt-12 lg:-mt-15 xl:-mt-20">
-        <div className="space-y-4 md:space-y-6 xl:space-y-8">
-          <h2 className="text-white text-center">{"Client's"} Feedback</h2>
-          {/* <p className="text-body text-center mt-3 lg:mt-5">
-            Our clients share their valuable thoughts
-          </p> */}
+    <section
+      ref={sectionRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="relative w-full overflow-hidden bg-[#FAF7F0] text-zinc-900 dark:bg-[#050507] dark:text-white py-10 md:py-12 lg:py-14 transition-colors duration-300"
+    >
+      {/* Subtle Cyber Grid */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-45 dark:opacity-35"
+        style={{
+          backgroundSize: "48px 48px",
+          backgroundImage:
+            "linear-gradient(to right, rgba(217, 119, 6, 0.06) 1px, transparent 1px), linear-gradient(to bottom, rgba(217, 119, 6, 0.06) 1px, transparent 1px)",
+        }}
+      />
+
+      {/* Interactive Cursor Spotlight */}
+      <div
+        className="pointer-events-none absolute inset-0 transition-opacity duration-500"
+        style={{
+          opacity: isHovered ? 1 : 0.35,
+          background: `radial-gradient(650px circle at ${mousePos.x}px ${mousePos.y}px, rgba(245, 158, 11, 0.15), transparent 70%)`,
+        }}
+      />
+
+      <div className="container relative z-10 mx-auto px-4 space-y-7 lg:space-y-9">
+        {/* Compact Section Header */}
+        <div className="max-w-3xl mx-auto text-center space-y-2.5">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-100/90 dark:bg-amber-500/10 border border-amber-500/40 shadow-[0_0_20px_rgba(245,158,11,0.18)]">
+            <div className="flex items-center gap-0.5 text-amber-500 dark:text-amber-400">
+              <Star className="w-3.5 h-3.5 fill-current" />
+              <Star className="w-3.5 h-3.5 fill-current" />
+              <Star className="w-3.5 h-3.5 fill-current" />
+              <Star className="w-3.5 h-3.5 fill-current" />
+              <Star className="w-3.5 h-3.5 fill-current" />
+            </div>
+            <span className="text-[11px] font-bold uppercase tracking-widest text-amber-900 dark:text-amber-300 ml-1">
+              Verified Traders • 4.9/5 Rating
+            </span>
+          </div>
+
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-white">
+            {"Client's"}{" "}
+            <span className="bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 dark:from-amber-200 dark:via-amber-400 dark:to-yellow-500 bg-clip-text text-transparent">
+              Feedback
+            </span>
+          </h2>
+
+          <p className="text-sm sm:text-base text-zinc-700 dark:text-zinc-300 font-medium">
+            Real screenshots and verified profit results shared by our global community.
+          </p>
         </div>
+
         <AnimatedModal
           isOpen={open}
           onClose={() => setOpen(false)}
@@ -146,7 +216,8 @@ export default function Testimonial() {
           setCurrentIndex={setCurrentIndex}
         />
 
-        <div className="flex justify-center mx-10 md:mx-20 mt-8 md:mt-10 lg:mt-15">
+        {/* Carousel Area */}
+        <div className="flex justify-center mx-8 sm:mx-14 md:mx-16">
           <Carousel plugins={[plugin.current]} className="w-full">
             <CarouselContent>
               {clientFeedbacksItems.map((feedback, index) => (
@@ -154,31 +225,48 @@ export default function Testimonial() {
                   key={feedback.id}
                   className="basis-full md:basis-1/2 lg:basis-1/3 xl:basis-1/4"
                 >
-                  <Card className="p-2 border-2 border-primary">
-                    <CardContent className="flex items-center justify-center p-2">
-                      <Image
-                        src={feedback.item}
-                        alt={feedback.alt}
-                        width={500}
-                        height={700}
-                        className="rounded-md shadow-lg hover:scale-105 duration-300 cursor-pointer h-[400px] md:h-[450px] xl:h-[500px]"
-                        onClick={() => {
-                          setCurrentIndex(index);
-                          setOpen(true);
-                        }}
-                      />
-                    </CardContent>
-                  </Card>
+                  <div className="p-1">
+                    <Card className="group relative overflow-hidden rounded-2xl p-[1px] bg-gradient-to-b from-amber-500/45 via-amber-400/20 to-amber-500/45 dark:from-amber-500/45 dark:via-zinc-800/70 dark:to-amber-500/35 hover:from-amber-400 hover:to-yellow-500 border-0 shadow-md hover:shadow-[0_0_30px_rgba(245,158,11,0.28)] transition-all duration-300">
+                      <CardContent className="rounded-2xl bg-white/95 dark:bg-[#0B0B10]/95 backdrop-blur-xl p-2.5 flex items-center justify-center">
+                        <div
+                          onClick={() => {
+                            setCurrentIndex(index);
+                            setOpen(true);
+                          }}
+                          className="relative w-full overflow-hidden rounded-xl cursor-pointer"
+                        >
+                          <Image
+                            src={feedback.item}
+                            alt={feedback.alt}
+                            width={500}
+                            height={700}
+                            className="w-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300 h-[380px] md:h-[430px] xl:h-[470px]"
+                          />
+
+                          {/* Hover Zoom Badge */}
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-400 text-black font-bold text-xs shadow-lg">
+                              <ZoomIn className="w-3.5 h-3.5" />
+                              View Review
+                            </span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
                 </CarouselItem>
               ))}
             </CarouselContent>
 
-            {/* Manual Arrows */}
-            <CarouselPrevious className="left-[-50px] cursor-pointer" />
-            <CarouselNext className="right-[-50px] cursor-pointer" />
+            {/* Luxury Gold Manual Arrows */}
+            <CarouselPrevious className="-left-9 sm:-left-12 bg-white/95 hover:bg-amber-400 text-zinc-900 hover:text-black dark:bg-[#14120D] dark:hover:bg-amber-400 dark:text-amber-300 dark:hover:text-black border border-amber-500/45 shadow-md cursor-pointer transition-all" />
+            <CarouselNext className="-right-9 sm:-right-12 bg-white/95 hover:bg-amber-400 text-zinc-900 hover:text-black dark:bg-[#14120D] dark:hover:bg-amber-400 dark:text-amber-300 dark:hover:text-black border border-amber-500/45 shadow-md cursor-pointer transition-all" />
           </Carousel>
         </div>
       </div>
+
+      {/* Bottom Subtle Gold Border */}
+      <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-amber-500/50 to-transparent pointer-events-none" />
     </section>
   );
 }
