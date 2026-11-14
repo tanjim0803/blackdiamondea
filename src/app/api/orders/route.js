@@ -1,5 +1,9 @@
 import { getOrders, addOrder } from "@/lib/googleSheet";
 
+const FREE_PRODUCT = "BlackDiamond_Free";
+const FREE_DOWNLOAD_LINK =
+  "https://drive.google.com/drive/folders/1wiEiIECiBPi3W5K3TCf8OwbuAtgEao8P?usp=sharing";
+
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
@@ -45,7 +49,11 @@ export async function GET(req) {
           return hasEmail && hasProduct;
         });
       }
-      return Response.json({ success: true, hasDownloaded });
+      return Response.json({
+        success: true,
+        hasDownloaded,
+        ...(hasDownloaded ? { downloadLink: FREE_DOWNLOAD_LINK } : {}),
+      });
     }
 
     // Otherwise, return all orders sorted by newest first
@@ -82,9 +90,19 @@ export async function POST(req) {
       );
     }
 
-    const finalPrice = product === "BlackDiamond_Free" ? 0 : (price ?? 0);
+    const hasFreeUid =
+      typeof uid === "string" && uid.trim() !== "" && uid.trim() !== "guest";
+
+    if (product === FREE_PRODUCT && !hasFreeUid) {
+      return Response.json(
+        { success: false, message: "Sign in to claim the free version." },
+        { status: 401 },
+      );
+    }
+
+    const finalPrice = product === FREE_PRODUCT ? 0 : (price ?? 0);
     const finalPaymentMethod =
-      product === "BlackDiamond_Free" ? "free" : paymentMethod || "card";
+      product === FREE_PRODUCT ? "free" : paymentMethod || "card";
 
     const createdAt = new Date().toISOString();
 
@@ -99,10 +117,11 @@ export async function POST(req) {
       createdAt,
     });
 
-    const downloadLink =
-      "https://drive.google.com/drive/folders/1wiEiIECiBPi3W5K3TCf8OwbuAtgEao8P?usp=sharing";
-
-    return Response.json({ success: true, orderId, downloadLink });
+    return Response.json({
+      success: true,
+      orderId,
+      downloadLink: FREE_DOWNLOAD_LINK,
+    });
   } catch (error) {
     return Response.json(
       { success: false, message: error.message },

@@ -5,8 +5,8 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import LogoIcon from "../../../public/logo.gif";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import {
   auth,
   loginWithEmailAndPassword,
@@ -15,8 +15,31 @@ import {
 import { useAuthState } from "react-firebase-hooks/auth";
 import { toast } from "react-toastify";
 
+function getSafeRedirect(value) {
+  if (typeof value !== "string") return "/";
+  if (!value.startsWith("/") || value.startsWith("//")) return "/";
+  if (/[\\\u0000-\u001f]/.test(value)) return "/";
+  try {
+    const url = new URL(value, "http://localhost");
+    if (url.origin !== "http://localhost") return "/";
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return "/";
+  }
+}
+
 export default function Login() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginContent />
+    </Suspense>
+  );
+}
+
+function LoginContent() {
   const navigate = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = getSafeRedirect(searchParams.get("redirect"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
@@ -60,7 +83,7 @@ export default function Login() {
       const user = await loginWithEmailAndPassword(email, password);
       if (user) {
         toast.success("Successfully logged in!");
-        navigate.push("/");
+        navigate.push(redirectTo);
       }
     } catch (err) {
       const firebaseErrors = {
@@ -92,7 +115,7 @@ export default function Login() {
       const user = await registerInWithGoogle();
       if (user) {
         toast.success("Successfully logged in!");
-        navigate.push("/");
+        navigate.push(redirectTo);
       }
       return user;
     } catch (err) {

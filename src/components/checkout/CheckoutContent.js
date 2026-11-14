@@ -337,7 +337,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -353,7 +353,13 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, LogIn, CheckCircle2, Loader2 } from "lucide-react";
+import {
+  ShoppingCart,
+  LogIn,
+  CheckCircle2,
+  Loader2,
+  Download,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/lib/firebase";
@@ -378,13 +384,18 @@ const PAYMENT_ROUTES = {
   perfect: "/checkout/payment/perfect",
 };
 
+const FREE_PRODUCT = "BlackDiamond_Free";
+
 export default function CheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [user] = useAuthState(auth);
+  const [user, authLoading] = useAuthState(auth);
 
   const product = searchParams.get("product") || "";
   const price = searchParams.get("price") || "0";
+  const isFreeProduct = product === FREE_PRODUCT;
+  const displayPrice = isFreeProduct ? "0" : price;
+  const userEmail = user?.email || "";
 
   const [form, setForm] = useState({
     name: "",
@@ -395,17 +406,57 @@ export default function CheckoutContent() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [downloadLink, setDownloadLink] = useState("");
+  const [claimStatus, setClaimStatus] = useState("idle");
+  const [claimedDownloadLink, setClaimedDownloadLink] = useState("");
+  const prefilledRef = useRef(false);
 
   useEffect(() => {
-    if (user) {
-      setForm((prev) => ({
-        ...prev,
-        name: user.displayName || "",
-        email: user.email || "",
-        phone: user.phoneNumber || "",
-      }));
-    }
+    if (!user || prefilledRef.current) return;
+    prefilledRef.current = true;
+    setForm((prev) => ({
+      ...prev,
+      name: prev.name || user.displayName || "",
+      email: prev.email || user.email || "",
+      phone: prev.phone || user.phoneNumber || "",
+    }));
   }, [user]);
+
+  useEffect(() => {
+    if (!isFreeProduct || !userEmail) {
+      setClaimStatus("idle");
+      setClaimedDownloadLink("");
+      return;
+    }
+
+    let cancelled = false;
+    setClaimStatus("checking");
+
+    const checkClaimStatus = async () => {
+      try {
+        const res = await fetch(
+          `/api/orders?email=${encodeURIComponent(userEmail)}`,
+        );
+        const data = await res.json();
+        if (cancelled) return;
+
+        if (data.success && data.hasDownloaded) {
+          setClaimStatus("claimed");
+          setClaimedDownloadLink(data.downloadLink || "");
+        } else {
+          setClaimStatus("not-claimed");
+        }
+      } catch {
+        if (!cancelled) setClaimStatus("not-claimed");
+      }
+    };
+
+    checkClaimStatus();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isFreeProduct, userEmail]);
 
   const handleChange = (field, value) =>
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -413,7 +464,7 @@ export default function CheckoutContent() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    if (!form.paymentMethod) {
+    if (!isFreeProduct && !form.paymentMethod) {
       setError("Please select a payment method.");
       return;
     }
@@ -428,8 +479,8 @@ export default function CheckoutContent() {
           email: form.email,
           phone: form.phone,
           product,
-          price,
-          paymentMethod: form.paymentMethod,
+          price: isFreeProduct ? 0 : price,
+          paymentMethod: isFreeProduct ? "free" : form.paymentMethod,
         }),
       });
       const data = await res.json();
@@ -437,6 +488,11 @@ export default function CheckoutContent() {
         throw new Error(data.message || "Failed to save order.");
 
       setSubmitted(true);
+
+      if (isFreeProduct) {
+        setDownloadLink(data.downloadLink || "");
+        return;
+      }
 
       const paymentBase =
         PAYMENT_ROUTES[form.paymentMethod] || "/checkout/payment/card";
@@ -494,21 +550,30 @@ export default function CheckoutContent() {
                       Price
                     </span>
                     <Badge className="text-base text-white font-semibold px-3 py-1 bg-primary">
-                      ${price}
+                      ${displayPrice}
                     </Badge>
                   </div>
                 </div>
                 <Separator className="border-dashed" />
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-body-large">Total</span>
-                  <span className="text-2xl font-semibold">${price}</span>
+                  <span className="text-2xl font-semibold">${displayPrice}</span>
                 </div>
               </CardContent>
             </Card>
 
             {/* Right Panel */}
             <div className="lg:col-span-3">
-              {!user ? (
+              {isFreeProduct && authLoading ? (
+                <Card className="py-10">
+                  <CardContent className="flex flex-col items-center justify-center gap-6 py-10 text-center">
+                    <Loader2 className="size-6 animate-spin text-muted-foreground" />
+                    <p className="text-body text-muted-foreground">
+                      Checking your account…
+                    </p>
+                  </CardContent>
+                </Card>
+              ) : isFreeProduct && !user ? (
                 <Card className="py-10">
                   <CardContent className="flex flex-col items-center justify-center gap-6 py-10 text-center">
                     <div className="rounded-full bg-muted p-5">
@@ -516,19 +581,21 @@ export default function CheckoutContent() {
                     </div>
                     <div className="space-y-2">
                       <h3 className="text-xl font-semibold">
-                        Sign in to continue
+                        Sign in to claim your free version
                       </h3>
                       <p className="text-body text-muted-foreground max-w-xs mx-auto">
-                        Please sign in to your account to order this product and
-                        complete your checkout.
+                        The free version is tied to your account. Sign in to
+                        continue, or create an account first.
                       </p>
                     </div>
                     <Button asChild className="mt-2 text-white w-full max-w-xs">
                       <Link
-                        href={`/login?redirect=/checkout?product=${encodeURIComponent(product)}&price=${price}`}
+                        href={`/login?redirect=${encodeURIComponent(
+                          `/checkout?product=${encodeURIComponent(product)}&price=${encodeURIComponent(price)}`,
+                        )}`}
                       >
                         <LogIn className="size-4 mr-2" />
-                        Sign In to Order
+                        Sign In to Claim
                       </Link>
                     </Button>
                     <p className="text-body text-muted-foreground text-sm">
@@ -542,6 +609,17 @@ export default function CheckoutContent() {
                     </p>
                   </CardContent>
                 </Card>
+              ) : isFreeProduct &&
+                userEmail &&
+                (claimStatus === "idle" || claimStatus === "checking") ? (
+                <Card className="py-10">
+                  <CardContent className="flex flex-col items-center justify-center gap-6 py-10 text-center">
+                    <Loader2 className="size-6 animate-spin text-muted-foreground" />
+                    <p className="text-body text-muted-foreground">
+                      Checking your free-version status…
+                    </p>
+                  </CardContent>
+                </Card>
               ) : submitted ? (
                 <Card className="py-10">
                   <CardContent className="flex flex-col items-center justify-center gap-6 py-10 text-center">
@@ -549,12 +627,70 @@ export default function CheckoutContent() {
                       <CheckCircle2 className="size-10 text-green-600 dark:text-green-400" />
                     </div>
                     <div className="space-y-2">
-                      <h3 className="text-xl font-semibold">Order Placed!</h3>
+                      <h3 className="text-xl font-semibold">
+                        {isFreeProduct
+                          ? "Free Version Claimed!"
+                          : "Order Placed!"}
+                      </h3>
                       <p className="text-body text-muted-foreground max-w-xs mx-auto">
-                        Redirecting you to the payment page…
+                        {isFreeProduct
+                          ? "Your download link is ready."
+                          : "Redirecting you to the payment page…"}
                       </p>
                     </div>
-                    <Loader2 className="size-5 animate-spin text-muted-foreground" />
+                    {isFreeProduct ? (
+                      downloadLink ? (
+                        <Button asChild className="text-white">
+                          <a
+                            href={downloadLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <Download className="size-4 mr-2" />
+                            Open Download Link
+                          </a>
+                        </Button>
+                      ) : (
+                        <p className="text-body text-muted-foreground">
+                          Contact support to receive your download link.
+                        </p>
+                      )
+                    ) : (
+                      <Loader2 className="size-5 animate-spin text-muted-foreground" />
+                    )}
+                  </CardContent>
+                </Card>
+              ) : isFreeProduct && claimStatus === "claimed" ? (
+                <Card className="py-10">
+                  <CardContent className="flex flex-col items-center justify-center gap-6 py-10 text-center">
+                    <div className="rounded-full bg-green-100 dark:bg-green-900/20 p-5">
+                      <CheckCircle2 className="size-10 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-semibold">
+                        Free Version Already Claimed
+                      </h3>
+                      <p className="text-body text-muted-foreground max-w-xs mx-auto">
+                        This account has already claimed the free version. Use
+                        the link below to access the files.
+                      </p>
+                    </div>
+                    {claimedDownloadLink ? (
+                      <Button asChild className="text-white">
+                        <a
+                          href={claimedDownloadLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Download className="size-4 mr-2" />
+                          Open Download Link
+                        </a>
+                      </Button>
+                    ) : (
+                      <p className="text-body text-muted-foreground">
+                        Contact support to receive your download link.
+                      </p>
+                    )}
                   </CardContent>
                 </Card>
               ) : (
@@ -602,30 +738,32 @@ export default function CheckoutContent() {
                           required
                         />
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="payment">Payment Method</Label>
-                        <Select
-                          value={form.paymentMethod}
-                          onValueChange={(val) =>
-                            handleChange("paymentMethod", val)
-                          }
-                          required
-                        >
-                          <SelectTrigger id="payment" className="w-full">
-                            <SelectValue placeholder="Select payment method" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-primary text-white">
-                            {PAYMENT_METHODS.map((method) => (
-                              <SelectItem
-                                key={method.value}
-                                value={method.value}
-                              >
-                                {method.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                      {!isFreeProduct && (
+                        <div className="space-y-2">
+                          <Label htmlFor="payment">Payment Method</Label>
+                          <Select
+                            value={form.paymentMethod}
+                            onValueChange={(val) =>
+                              handleChange("paymentMethod", val)
+                            }
+                            required
+                          >
+                            <SelectTrigger id="payment" className="w-full">
+                              <SelectValue placeholder="Select payment method" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-primary text-white">
+                              {PAYMENT_METHODS.map((method) => (
+                                <SelectItem
+                                  key={method.value}
+                                  value={method.value}
+                                >
+                                  {method.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
                       {error && (
                         <p className="text-sm text-red-500 dark:text-red-400">
                           {error}
@@ -640,10 +778,12 @@ export default function CheckoutContent() {
                         {loading ? (
                           <>
                             <Loader2 className="size-4 mr-2 animate-spin" />
-                            Placing Order…
+                            {isFreeProduct ? "Claiming…" : "Placing Order…"}
                           </>
+                        ) : isFreeProduct ? (
+                          "Claim Free Version"
                         ) : (
-                          `Place Order — $${price}`
+                          `Place Order — $${displayPrice}`
                         )}
                       </Button>
                       <p className="text-xs text-muted-foreground text-center">

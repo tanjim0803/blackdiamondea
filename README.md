@@ -129,14 +129,16 @@ The home-page pricing section still uses the legacy labels `BlackDiamond_Basic`,
 
 - A global free-offer popup (`FreeOfferPopupGlobal`) appears after a 7-second delay, or immediately after a visitor uses one of the popup's own sign-in links (which sets a `sessionStorage` flag). It is suppressed on auth pages, when session storage marks it dismissed, and when the user already has a free order.
 - A fixed **Get Free AI** button in the layout and a header button open the same offer.
-- Logged-out visitors are routed to `/login`. Logged-in visitors trigger `POST /api/orders` with `product: "BlackDiamond_Free"` and `price: 0`.
-- The API appends the order to Google Sheets and returns a hard-coded Google Drive download link, which the client opens in a new tab.
+- Claiming the free version requires a signed-in, email-verified account. Logged-out visitors are routed to `/login`; logged-in visitors trigger `POST /api/orders` with `product: "BlackDiamond_Free"` and `price: 0`.
+- The API appends the order to Google Sheets and returns a hard-coded Google Drive download link, which the client opens in a new tab. Free orders without a real Firebase UID are rejected with `401`.
 - Download eligibility is checked with `GET /api/orders?email=...`, which scans the Orders tab for an email/product match.
 
 ### Checkout and Order Intake
 
-- `/checkout` collects name, email, phone, and one of seven payment methods.
-- If a Firebase user is signed in, the form is prefilled from the Firebase profile; checkout also works as a guest (`uid: "guest"`).
+- `/checkout` collects name, email, phone, and one of seven payment methods. Paid plans can be purchased as a guest; no account is required.
+- If a Firebase user is signed in, the form is prefilled from the Firebase profile and the order stores that UID. Guests are recorded with `uid: "guest"`.
+- The free product (`BlackDiamond_Free`) is the exception: it requires a signed-in account. A signed-out visitor sees a sign-in gate, and `POST /api/orders` rejects free orders without a real UID with `401`.
+- For the free product, checkout hides the payment-method selector, submits price `0` and method `free`, and shows the returned Google Drive download link instead of redirecting to a payment page.
 - Submission posts to `/api/orders`, which validates the required fields, appends a row to Google Sheets, and returns an order ID in the form `ORD-<timestamp>`.
 - The client shows a success state and redirects after roughly 1.2 seconds to `/checkout/payment/{method}` with `product`, `price`, and `orderId` in the query string.
 - Each payment page displays the selected plan and order ID, the payment instructions, copy-to-clipboard controls where applicable, a method-switcher dropdown, support links, and a Telegram support link.
@@ -420,7 +422,7 @@ All routes below exist as `page.js` or `page.jsx` files under `src/app`. There a
 |---|---|---|---|
 | `/` | Home | Landing page with hero, product sections, portfolios, backtests, testimonials, pricing, articles, and partners | Public |
 | `/pricing` | Pricing | Three plans with feature lists and checkout links | Public |
-| `/checkout` | Checkout | Order form and summary; posts to `/api/orders` | Public; prefills from Firebase user when signed in |
+| `/checkout` | Checkout | Order form and summary; posts to `/api/orders` | Public for paid plans; free product requires sign-in; prefills for signed-in users |
 | `/checkout/payment/card` | Card payment | Visa/Mastercard instructions and external Stripe payment links | Public; order ID in query string |
 | `/checkout/payment/paypal` | PayPal payment | PayPal transfer instructions | Public; order ID in query string |
 | `/checkout/payment/stripe` | Stripe payment | Stripe payment links and fallback instructions | Public; order ID in query string |
@@ -464,8 +466,8 @@ In addition, `src/app/not-found.js` renders the custom 404 page with routes back
 |---|---|---|---|
 | `/api/users` | `GET` | Returns `{ success, data }` with every row from the `Users` tab | None |
 | `/api/users` | `POST` | Accepts `uid`, `name`, `email`, `phone`; appends a user when the email is not already present | None |
-| `/api/orders` | `GET` | Returns all orders sorted newest first; with `?email=...` returns `{ hasDownloaded }` by scanning for a `BlackDiamond_Free` order | None |
-| `/api/orders` | `POST` | Validates `name`, `email`, `phone`, `product`; appends an order with status `pending`; returns `orderId` and, for the free product, a download link | None |
+| `/api/orders` | `GET` | Returns all orders sorted newest first; with `?email=...` returns `{ hasDownloaded }` (plus `downloadLink` when already claimed) by scanning for a `BlackDiamond_Free` order | None |
+| `/api/orders` | `POST` | Validates `name`, `email`, `phone`, `product`; appends an order with status `pending`; returns `orderId` and a download link. Free orders require a non-guest `uid` and otherwise return `401` | None |
 
 ### Routing Notes
 
@@ -570,9 +572,9 @@ Unmapped errors fall back to a generic message.
 There is no route protection layer:
 
 - All pages are publicly reachable.
-- Checkout allows guests and does not require a Firebase session.
+- Paid checkout allows guests and does not require a Firebase session. The free product requires a signed-in, email-verified account, and `POST /api/orders` rejects free orders without a real UID.
 - The reseller dashboard checks only `localStorage` for `reseller_user` and redirects to `/reseller` when absent. It does not validate a token with the PHP backend.
-- API routes perform no authentication or authorization checks.
+- API routes perform no real authentication or authorization checks; the free-order UID check is a soft guard that can be bypassed with any non-empty UID.
 
 ## External Integrations
 
@@ -962,7 +964,9 @@ The project is deployed on Vercel and the live URL is <https://blackdiamondeaspe
 7. **Verify the deployment.**
    - Register a new account and confirm the verification email arrives.
    - Log in after verification and confirm the user appears in the `Users` sheet.
-   - Complete a checkout and confirm the order appears in the `Orders` sheet.
+   - Complete a paid checkout while signed out and confirm the order appears in the `Orders` sheet with `uid: "guest"`.
+   - Complete a paid checkout while signed in and confirm the row stores the Firebase UID.
+   - Confirm the free checkout gate blocks signed-out visitors and that a signed-in claim returns a working download link.
    - Open each payment instruction page with a valid `product`, `price`, and `orderId`.
    - Submit the contact form and confirm EmailJS delivery.
    - Confirm the free-download popup returns a working link.
